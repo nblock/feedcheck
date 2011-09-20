@@ -71,6 +71,7 @@ def read_xml_url_from_file(file_object):
 
 
 def main(filename, max_age, threads):
+    '''set up threads and start work'''
     xml_queue = Queue.Queue()
 
     #init Feedcheck
@@ -86,12 +87,13 @@ def main(filename, max_age, threads):
     #wait and finish
     xml_queue.join()
 
+
 if __name__ == "__main__":
     '''parse arguments'''
-    parser = argparse.ArgumentParser(description='Check availability of Feeds from an opml file.')
-    parser.add_argument('-t', '--threads', type=int, default=2, help='The number of threads to use in parallel.')
-    parser.add_argument('-a', '--age', type=int, default=365, help='The minimum age in days.')
-    parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML data')
+    parser = argparse.ArgumentParser(description='Check availability of feeds from an opml file.')
+    parser.add_argument('-t', '--threads', type=int, default=2, help='The number of threads to use in parallel (default: 2).')
+    parser.add_argument('-a', '--age', type=int, default=365, help='The minimum age in days (default: 365).')
+    parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML input file (default: stdin)')
     args = parser.parse_args()
 
     main(filename=args.file, max_age= args.age, threads=args.threads)
