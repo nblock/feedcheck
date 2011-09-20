@@ -12,6 +12,7 @@ Description : Check availability of feeds from an opml file or stdin.
 Requirements: python>=2.7, requests, feedparser
 '''
 from xml.etree import ElementTree
+from xml.etree.ElementTree import ParseError
 import Queue
 import threading
 import feedparser
@@ -63,10 +64,13 @@ def read_xml_url_from_file(file_object):
     '''read a opml file and return xmlUrl attrib as list.'''
     xml_urls = []
     with file_object:
-        tree = ElementTree.parse(file_object)
-        for node in tree.getiterator('outline'):
-            url = node.attrib.get('xmlUrl')
-            xml_urls.append(url)
+        try:
+            tree = ElementTree.parse(file_object)
+            for node in tree.getiterator('outline'):
+                url = node.attrib.get('xmlUrl')
+                xml_urls.append(url)
+        except ParseError, e:
+            print("Could not parse OPML file: '{}'".format(e))
     return xml_urls
 
 
