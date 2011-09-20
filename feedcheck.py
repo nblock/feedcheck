@@ -60,6 +60,16 @@ class Feedcheck(threading.Thread):
             self.queue.task_done()
 
 
+def get_input_from_file(file_object):
+    '''Select either OPML or plain file parsing and return list with urls.'''
+    line = file_object.readline()
+    file_object.seek(0)
+    if line.startswith('<'):
+        return read_xml_url_from_file(file_object)
+    else:
+        return read_plain_url_from_file(file_object)
+
+
 def read_xml_url_from_file(file_object):
     '''read a opml file and return xmlUrl attrib as list.'''
     xml_urls = []
@@ -77,6 +87,16 @@ def read_xml_url_from_file(file_object):
     return xml_urls
 
 
+def read_plain_url_from_file(file_object):
+    '''read a plain file and return urls as list.'''
+    http_urls = []
+    with file_object:
+        temp_urls = file_object.readlines()
+        for line in temp_urls:
+            http_urls.append(line.strip())
+    return http_urls
+
+
 def main(filename, max_age, threads):
     '''set up threads and start work'''
     xml_queue = Queue.Queue()
@@ -88,7 +108,7 @@ def main(filename, max_age, threads):
          t.start()
 
     #put urls in there
-    for item in read_xml_url_from_file(filename):
+    for item in get_input_from_file(filename):
         xml_queue.put(item)
 
     #wait and finish
