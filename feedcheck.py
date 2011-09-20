@@ -98,7 +98,7 @@ def main(filename, max_age, threads):
 if __name__ == "__main__":
     '''parse arguments'''
     parser = argparse.ArgumentParser(description='Check availability of feeds from an opml file.')
-    parser.add_argument('-t', '--threads', type=int, default=2, help='The number of threads to use in parallel (default: 2).')
+    parser.add_argument('-t', '--threads', type=int, choices=xrange(1, 10), default=2, help='The number of threads to use in parallel (default: 2).')
     parser.add_argument('-a', '--age', type=int, default=365, help='The minimum age in days (default: 365).')
     parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML input file (default: stdin)')
     args = parser.parse_args()
