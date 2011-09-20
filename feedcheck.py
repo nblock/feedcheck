@@ -9,7 +9,7 @@ License : GPLv3
 
 Description : Check feed availability from an opml file.
 
-Requirements: python2, requests, feedparser
+Requirements: python>=2.7, requests, feedparser
 '''
 from xml.etree import ElementTree
 import Queue
@@ -18,18 +18,17 @@ import feedparser
 import requests
 import time
 import datetime
-
-THREADS = 1
-MAX_AGE_IN_DAYS = 365
+import argparse
+import sys
 
 class Feedcheck(threading.Thread):
     '''Check availability of feeds.'''
 
-    def __init__( self, queue ):
+    def __init__( self, queue, max_age ):
         threading.Thread.__init__(self)
         self.queue = queue
         self.now = datetime.datetime.now()
-        self.max_age = datetime.timedelta(days=MAX_AGE_IN_DAYS)
+        self.max_age = datetime.timedelta(days=max_age)
 
     def run(self):
         while True:
@@ -60,32 +59,41 @@ class Feedcheck(threading.Thread):
             self.queue.task_done()
 
 
-def read_xml_url_from_file(file_name):
+def read_xml_url_from_file(file_object):
     '''read a opml file and return xmlUrl attrib as list.'''
     xml_urls = []
-    with open(file_name, 'r') as f:
-        tree = ElementTree.parse(f)
+    with file_object:
+        tree = ElementTree.parse(file_object)
         for node in tree.getiterator('outline'):
             url = node.attrib.get('xmlUrl')
             xml_urls.append(url)
     return xml_urls
 
 
-if __name__ == "__main__":
+def main(filename, max_age, threads):
     xml_queue = Queue.Queue()
 
     #init Feedcheck
-    for i in range(THREADS):
-         t = Feedcheck(xml_queue)
+    for i in range(threads):
+         t = Feedcheck(xml_queue, max_age)
          t.setDaemon(True)
          t.start()
 
     #put urls in there
-    for item in read_xml_url_from_file('/home/flo/test.opml'):
+    for item in read_xml_url_from_file(filename):
         xml_queue.put(item)
 
     #wait and finish
     xml_queue.join()
 
+if __name__ == "__main__":
+    '''parse arguments'''
+    parser = argparse.ArgumentParser(description='Check availability of Feeds from an opml file.')
+    parser.add_argument('-t', '--threads', type=int, default=2, help='The number of threads to use in parallel.')
+    parser.add_argument('-a', '--age', type=int, default=365, help='The minimum age in days.')
+    parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML data')
+    args = parser.parse_args()
+
+    main(filename=args.file, max_age= args.age, threads=args.threads)
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4 smartindent autoindent 
