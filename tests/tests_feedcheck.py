@@ -24,28 +24,24 @@ class TestFeedcheck(unittest.TestCase):
 
     def test_pass_valid_opml(self):
         '''Test if Feedcheck can handle valid OPML input.'''
-        f = open(''.join((self._path_to_opml, 'valid.opml')), 'r')
-        self.assertEqual(self._known_good, feedcheck.get_input_from_file(f))
-        f.close()
+        with open(''.join((self._path_to_opml, 'valid.opml')), 'r') as f:
+            self.assertEqual(self._known_good, feedcheck.get_input_from_file(f))
     
     def test_pass_invalid_opml(self):
         '''Test if Feedcheck can handle invalid OPML input.'''
-        f = open(''.join((self._path_to_opml, 'invalid.opml')), 'r')
-        self.assertEqual([], feedcheck.get_input_from_file(f))
-        f.close()
+        with open(''.join((self._path_to_opml, 'invalid.opml')), 'r') as f:
+            self.assertEqual([], feedcheck.get_input_from_file(f))
     
     def test_pass_valid_opml_with_missing_xmlurl_tag(self):
         '''Test if Feedcheck can handle valid OPML input that misses xmlurl tags.'''
-        f = open(''.join((self._path_to_opml, 'invalid-missing-xmlurl.opml')), 'r')
-        self.assertEqual(self._known_good[1:], feedcheck.get_input_from_file(f))
-        f.close()
+        with open(''.join((self._path_to_opml, 'invalid-missing-xmlurl.opml')), 'r') as f:
+            self.assertEqual(self._known_good[1:], feedcheck.get_input_from_file(f))
 
     def test_pass_valid_plain(self):
         '''Test if Feedcheck can handle valid plain input.'''
-        f = open(''.join((self._path_to_opml, 'valid.plain')), 'r')
-        self.assertEqual(self._known_good, feedcheck.get_input_from_file(f))
-        f.close()
-        
+        with open(''.join((self._path_to_opml, 'valid.plain')), 'r') as f:
+            self.assertEqual(self._known_good, feedcheck.get_input_from_file(f))
+
 
 if __name__ == '__main__':
     unittest.main()
