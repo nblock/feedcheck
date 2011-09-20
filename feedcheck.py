@@ -103,6 +103,6 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML input file (default: stdin)')
     args = parser.parse_args()
 
-    main(filename=args.file, max_age= args.age, threads=args.threads)
+    main(filename=args.file, max_age=args.age, threads=args.threads)
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4 smartindent autoindent 
