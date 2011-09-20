@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<opml version="1.0">
+  <head>
+    <title>newsbeuter - Exported Feeds</title>
+  </head>
+  <body>
+    <outline type="rss" htmlUrl="http://www.schneier.com/blog/" title="Bruce Schneier Blog"/>
+    <outline type="rss" xmlUrl="http://inj3ct0r.com/rss"/>
+    <outline xmlUrl="http://www.exploit-db.com/rss.php" htmlUrl="http://www.exploit-db.com" title="exploit-db exploits"/>
+  </body>
+</opml>

@@ -31,9 +31,13 @@ class TestFeedcheck(unittest.TestCase):
     def test_pass_invalid_opml(self):
         '''Test if Feedcheck can handle invalid OPML input.'''
         f = open(''.join((self._path_to_opml, 'invalid.opml')), 'r')
-        #self.assertRaises(ParseError, feedcheck.read_xml_url_from_file(f))
-        #self.assertRaises(ParseError, feedcheck.read_xml_url_from_file(f))
         self.assertEqual([], feedcheck.read_xml_url_from_file(f))
+        f.close()
+    
+    def test_pass_valid_opml_with_missing_xmlurl_tag(self):
+        '''Test if Feedcheck can handle valid OPML input that misses xmlurl tags.'''
+        f = open(''.join((self._path_to_opml, 'invalid-missing-xmlurl.opml')), 'r')
+        self.assertEqual(self._known_good[1:], feedcheck.read_xml_url_from_file(f))
         f.close()
 
 if __name__ == '__main__':

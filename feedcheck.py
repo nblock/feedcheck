@@ -68,6 +68,9 @@ def read_xml_url_from_file(file_object):
             tree = ElementTree.parse(file_object)
             for node in tree.getiterator('outline'):
                 url = node.attrib.get('xmlUrl')
+                if url == None:
+                    print('Missing xmlUrl-tag in OPML file.')
+                    continue
                 xml_urls.append(url)
         except ParseError, e:
             print("Could not parse OPML file: '{}'".format(e))
