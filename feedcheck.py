@@ -29,20 +29,20 @@ class Feedcheck(threading.Thread):
         threading.Thread.__init__(self)
         self.queue = queue
         self.now = datetime.datetime.now()
-        self.timedelta = datetime.timedelta(days=MAX_AGE_IN_DAYS)
+        self.max_age = datetime.timedelta(days=MAX_AGE_IN_DAYS)
 
     def run(self):
         while True:
+            proceed = True
             item = self.queue.get()
             res = requests.get(item)
-            proceed = True
-            #print(item)
             
-            #status code other than 200
+            #status code other than http 200
             if res.status_code != 200:
                 print("status code '{}' -> '{}'".format(res.status_code, item))
                 proceed = False
-               
+            
+            #http 200, proceed
             if proceed:
                 fp = feedparser.parse(res.content)
 
@@ -52,12 +52,13 @@ class Feedcheck(threading.Thread):
                     feed_datetime = datetime.datetime.fromtimestamp(time.mktime(feed_time_tuple))
 
                     time_since_last_udpate = self.now - feed_datetime
-                    if time_since_last_udpate > self.timedelta:
+                    if time_since_last_udpate > self.max_age:
                         print("last update: '{}' ->  '{}'".format(time_since_last_udpate, item))
                 else:
                     print("last update unknown: '{}'".format(item))
 
             self.queue.task_done()
+
 
 def read_xml_url_from_file(file_name):
     '''read a opml file and return xmlUrl attrib as list.'''
