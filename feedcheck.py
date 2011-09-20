@@ -7,7 +7,7 @@ Contact : nblock [/at\] archlinux DOT us
 Date    : 20.09.2011
 License : GPLv3
 
-Description : Check feed availability from an opml file.
+Description : Check availability of feeds from an opml file or stdin.
 
 Requirements: python>=2.7, requests, feedparser
 '''
