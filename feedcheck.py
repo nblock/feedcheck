@@ -7,7 +7,7 @@ Contact : nblock [/at\] archlinux DOT us
 Date    : 20.09.2011
 License : GPLv3
 
-Description : Check availability of feeds from an opml file or stdin.
+Description : Check availability of feeds from opml or plain input.
 
 Requirements: python>=2.7, requests, feedparser
 '''
@@ -120,7 +120,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Check availability of feeds from an opml file.')
     parser.add_argument('-t', '--threads', type=int, choices=xrange(1, 10), default=2, help='The number of threads to use in parallel (default: 2).')
     parser.add_argument('-a', '--age', type=int, default=365, help='The minimum age in days (default: 365).')
-    parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The OPML input file (default: stdin)')
+    parser.add_argument('-f', '--file', type=argparse.FileType('r'), default=sys.stdin, help='The input file in OPML or plain format (default: stdin)')
     args = parser.parse_args()
 
     main(filename=args.file, max_age=args.age, threads=args.threads)
