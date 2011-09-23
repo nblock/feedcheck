@@ -70,20 +70,21 @@ class Feedcheck(threading.Thread):
                 print("last update: '{}':  '{}'".format(time_since_last_udpate, self._item))
         else:
             print("last update unknown: '{}'".format(self._item))
-        
+       
+
 def get_input_from_file(file_object):
     '''Select either OPML or plain file parsing and return list with urls.'''
     line = file_object.readline()
     file_object.seek(0)
     if line.startswith('<'):
-        return read_xml_url_from_file(file_object)
+        return read_opml_from_file(file_object)
     else:
         return read_plain_url_from_file(file_object)
 
 
-def read_xml_url_from_file(file_object):
-    '''read a opml file and return xmlUrl attrib as list.'''
-    xml_urls = []
+def read_opml_from_file(file_object):
+    '''Read a opml file and return xmlUrl attrib as list.'''
+    opml_urls = []
     with file_object:
         try:
             tree = ElementTree.parse(file_object)
@@ -92,10 +93,10 @@ def read_xml_url_from_file(file_object):
                 if url == None:
                     print('Missing xmlUrl-tag in OPML file.')
                     continue
-                xml_urls.append(url)
+                opml_urls.append(url)
         except ParseError, e:
             print("Could not parse OPML file: '{}'".format(e))
-    return xml_urls
+    return opml_urls
 
 
 def read_plain_url_from_file(file_object):
