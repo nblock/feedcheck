@@ -30,36 +30,47 @@ class Feedcheck(threading.Thread):
         self.queue = queue
         self.now = datetime.datetime.now()
         self.max_age = datetime.timedelta(days=max_age)
+        self._item = None
+        self._response = None
+        self._parsed_feed = None
 
     def run(self):
         while True:
-            proceed = True
-            item = self.queue.get()
-            res = requests.get(item)
+            self._item = self.queue.get()
+            self._response = requests.get(self._item)
             
-            #status code other than http 200
-            if res.status_code != 200:
-                print("status code '{}' -> '{}'".format(res.status_code, item))
-                proceed = False
-            
-            #http 200, proceed
-            if proceed:
-                fp = feedparser.parse(res.content)
-
-                #try to get last updated date
-                if fp.feed.has_key('updated_parsed'):
-                    feed_time_tuple = time.struct_time(fp.feed.updated_parsed)
-                    feed_datetime = datetime.datetime.fromtimestamp(time.mktime(feed_time_tuple))
-
-                    time_since_last_udpate = self.now - feed_datetime
-                    if time_since_last_udpate > self.max_age:
-                        print("last update: '{}' ->  '{}'".format(time_since_last_udpate, item))
-                else:
-                    print("last update unknown: '{}'".format(item))
+            if self._process_status_code():
+                self._parsed_feed = feedparser.parse(self._response)
+                self._process_max_age()
 
             self.queue.task_done()
 
 
+    def _process_status_code(self):
+        '''check for status code other than http 200 and print error messages
+
+        TODO: handle common http status codes: 404/301...
+        Returns True if status code is 200, False otherwise.
+        '''
+        ret_bool = True
+        if self._response.status_code != 200:
+            print("status code '{}': '{}'".format(self._response.status_code, self._item))
+            ret_bool = False
+        return ret_bool
+
+    def _process_max_age(self):
+        '''check for max age (if available).'''
+        #try to get last updated date
+        if self._parsed_feed.feed.has_key('updated_parsed') and self._parsed_feed.feed.updated_parsed != None:  
+            feed_time_tuple = time.struct_time(self._parsed_feed.feed.updated_parsed)
+            feed_datetime = datetime.datetime.fromtimestamp(time.mktime(feed_time_tuple))
+
+            time_since_last_udpate = self.now - feed_datetime
+            if time_since_last_udpate > self.max_age:
+                print("last update: '{}':  '{}'".format(time_since_last_udpate, self._item))
+        else:
+            print("last update unknown: '{}'".format(self._item))
+        
 def get_input_from_file(file_object):
     '''Select either OPML or plain file parsing and return list with urls.'''
     line = file_object.readline()
