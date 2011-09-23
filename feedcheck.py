@@ -37,14 +37,19 @@ class Feedcheck(threading.Thread):
     def run(self):
         while True:
             self._item = self.queue.get()
-            self._response = requests.get(self._item)
+            self._perform_request()
             
             if self._process_status_code():
-                self._parsed_feed = feedparser.parse(self._response)
+                self._parse_feed()
                 self._process_max_age()
 
             self.queue.task_done()
 
+    def _perform_request(self):
+        self._response = requests.get(self._item)
+
+    def _parse_feed(self):
+        self._parsed_feed = feedparser.parse(self._response)
 
     def _process_status_code(self):
         '''check for status code other than http 200 and print error messages
